@@ -136,3 +136,10 @@ echo " "
 echo "##Many2Many 24"
 output=$(srun -n 24 ./m2m autograderdata/inputm2_24.txt autograderdata/outputm2_24.txt)
 echo "$output"
+'
+
+rm -rf autograderout/
+if [[ $? -eq 124 ]]; then
+    echo "Error: Script execution exceeded $MAX_EXECUTION_TIME seconds."
+    exit 1
+fi
