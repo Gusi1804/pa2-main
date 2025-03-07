@@ -16,6 +16,7 @@ int main(int argc, char *argv[]) {
   int  num_elem;
   int* local_array;
   int* global_sum_custom;
+  int* global_sum_default = nullptr;
 
   /* read the input file PE 0 and send all the processors the data they need */
   if (argc < 2 || argc > 3) {
@@ -72,6 +73,7 @@ int main(int argc, char *argv[]) {
 
   /* call the default MPI function */
   double start_default = MPI_Wtime();
+  global_sum_default = new int[num_elem];
   MPI_Allreduce(local_array, global_sum_default, num_elem, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
   double end_default = MPI_Wtime();
   double local_default_time = end_default - start_default, global_default_time;
@@ -94,6 +96,7 @@ int main(int argc, char *argv[]) {
   /* free all dynamically allocated memory */
   delete[] local_array;
   delete[] global_sum_custom;
+  delete[] global_sum_default;
 
   /* MPI Finalize */
   MPI_Finalize();

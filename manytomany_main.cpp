@@ -16,6 +16,7 @@ int main(int argc, char *argv[]) {
   int* send_data;
   int* sendcounts;
   int* recv_data_custom = nullptr;
+  int* recv_data_default = nullptr;
 
   /* read the input file PE 0 and send all the processors the data they need */
   sendcounts = new int[size];
@@ -82,9 +83,10 @@ int main(int argc, char *argv[]) {
   MPI_Allreduce(&local_custom_time, &global_custom_time, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
   if (rank == 0) printf("Time taken by custom function: %f\n", global_custom_time);
 
-  
+
   /* Call the default MPI function */
   double start_default = MPI_Wtime();
+  recv_data_default = new int[send_data_size]; // Appropriate size needed
   int recv_num_default = MPI_Alltoallv(send_data, sendcounts, sendcounts, MPI_INT, recv_data_default, sendcounts, sendcounts, MPI_INT, MPI_COMM_WORLD);
   double end_default = MPI_Wtime();
   double local_default_time = end_default - start_default, global_default_time;
@@ -150,6 +152,7 @@ int main(int argc, char *argv[]) {
   delete[] send_data;
   delete[] sendcounts;
   delete[] recv_data_custom;
+  delete[] recv_data_default;
 
   /* MPI Finalize */
   MPI_Finalize();
