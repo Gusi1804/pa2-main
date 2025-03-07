@@ -82,6 +82,16 @@ int main(int argc, char *argv[]) {
   MPI_Allreduce(&local_custom_time, &global_custom_time, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
   if (rank == 0) printf("Time taken by custom function: %f\n", global_custom_time);
 
+  
+  /* Call the default MPI function */
+  double start_default = MPI_Wtime();
+  int recv_num_default = MPI_Alltoallv(send_data, sendcounts, sendcounts, MPI_INT, recv_data_default, sendcounts, sendcounts, MPI_INT, MPI_COMM_WORLD);
+  double end_default = MPI_Wtime();
+  double local_default_time = end_default - start_default, global_default_time;
+  MPI_Allreduce(&local_default_time, &global_default_time, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+  if (rank == 0) printf("Time taken by default function: %f\n", global_default_time);
+
+
   if (argc == 2) {
     MPI_Finalize();
     return 0;
