@@ -85,9 +85,11 @@ int main(int argc, char *argv[]) {
 
 
   /* Call the default MPI function */
-  double start_default = MPI_Wtime();
-  recv_data_default = new int[send_data_size]; // Appropriate size needed
-  int recv_num_default = MPI_Alltoallv(send_data, sendcounts, sendcounts, MPI_INT, recv_data_default, sendcounts, sendcounts, MPI_INT, MPI_COMM_WORLD);
+  // Call MPI_Alltoallv with proper parameters
+  MPI_Alltoallv(send_data, sendcounts, senddispls, MPI_INT, 
+    recv_data_default, recvcounts, recvdispls, MPI_INT, 
+    MPI_COMM_WORLD);
+
   double end_default = MPI_Wtime();
   double local_default_time = end_default - start_default, global_default_time;
   MPI_Allreduce(&local_default_time, &global_default_time, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
