@@ -85,7 +85,35 @@ int main(int argc, char *argv[]) {
 
 
   /* Call the default MPI function */
-  // Call MPI_Alltoallv with proper parameters
+  double start_default = MPI_Wtime();
+  
+  // Calculate send displacements
+  int* senddispls = new int[size];
+  senddispls[0] = 0;
+  for (int i = 1; i < size; i++) {
+    senddispls[i] = senddispls[i-1] + sendcounts[i-1];
+  }
+  
+  // Exchange sendcounts to get recvcounts
+  int* recvcounts = new int[size];
+  MPI_Alltoall(sendcounts, 1, MPI_INT, recvcounts, 1, MPI_INT, MPI_COMM_WORLD);
+  
+  // Calculate receive displacements
+  int* recvdispls = new int[size];
+  recvdispls[0] = 0;
+  for (int i = 1; i < size; i++) {
+    recvdispls[i] = recvdispls[i-1] + recvcounts[i-1];
+  }
+  
+  // Calculate total receive size
+  int total_recv_size = 0;
+  for (int i = 0; i < size; i++) {
+    total_recv_size += recvcounts[i];
+  }
+  
+  // Allocate receive buffer with correct size
+  recv_data_default = new int[total_recv_size];
+  
   MPI_Alltoallv(send_data, sendcounts, senddispls, MPI_INT, 
     recv_data_default, recvcounts, recvdispls, MPI_INT, 
     MPI_COMM_WORLD);
