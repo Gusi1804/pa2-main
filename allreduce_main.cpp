@@ -80,6 +80,23 @@ int main(int argc, char *argv[]) {
   MPI_Allreduce(&local_default_time, &global_default_time, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
   if (rank == 0) printf("Time taken by default function: %f\n", global_default_time);
 
+  /* Verify that both implementations produce the same results */
+  bool results_match = true;
+  for (int i = 0; i < num_elem; i++) {
+    if (global_sum_custom[i] != global_sum_default[i]) {
+      results_match = false;
+      if (rank == 0) {
+        printf("Results mismatch at index %d: custom=%d, default=%d\n", 
+              i, global_sum_custom[i], global_sum_default[i]);
+      }
+      break;
+    }
+  }
+
+  if (rank == 0 && results_match) {
+    printf("Custom implementation results match default MPI implementation!\n");
+  }
+
   if (argc == 2) {
     MPI_Finalize();
     return 0;
